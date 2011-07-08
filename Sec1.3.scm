@@ -80,7 +80,7 @@
   (g 2))
 ;Value: f
 
-(f f)
+;(f f)
 ;The object 2 is not applicable.
 
 
