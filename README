@@ -1,7 +1,10 @@
-This is my attempt at solutions to the exercises in SICP.
+This is my attempt at solutions to the exercises in SICP. Using MIT-Scheme under GNU Emacs.
 
 Main Page:
 http://mitpress.mit.edu/sicp/
 
 Table of Contents:
 http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-4.html#%_toc_start
+
+The code can generally be evaluated by copying it into the JavaScript interpreter at 
+http://www.bluishcoder.co.nz/jsscheme/
