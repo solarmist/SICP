@@ -21,3 +21,9 @@
 ;same whether the interpreter is using normal or applicative order: The predicate 
 ;expression is evaluated first, and the result determines whether to evaluate the 
 ;consequent or the alternative expression.)
+
+;The normal-order evaluation would result in y being substituted only if it's needed, 
+;i.e. if x != 0.
+
+;The applicative-order evaluation would attempt to expand y "fully" which would cause the 
+;interpreter to fill the stack with references to (p), causing a stack overflow.
