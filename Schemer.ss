@@ -245,7 +245,65 @@
 		 (rempick (sub1 n) 
 			  (cdr lat)))))))
 
+(define no-nums
+  (lambda (lat)
+    (cond
+     ((null? lat) '())
+     ((number? (car lat)) (no-nums (cdr lat)))
+     (else (cons (car lat)
+		 (no-nums (cdr lat)))))))
+
+(define all-nums
+  (lambda (lat)
+    (cond
+     ((null? lat) '())
+     ((number? (car lat)) (cons (car lat)
+				(all-nums (cdr lat))))
+     (else (all-nums (cdr lat))))))
+
+(define eqan?
+  (lambda (a1 a2)
+    (cond
+     ((and (number? a1) (number? a2)) (= a1 a2))
+     ((or (number? a1) (number? a2)) #f)
+     (else (eq? a1 a2)))))
+
+(define occur
+  (lambda (a lat)
+    (cond
+     ((null? lat) 0)
+     ((eq? a (car lat)) (add1 (occur a (cdr lat))))
+     (else (occur a (cdr lat))))))
+
+(define one?
+  (lambda (n)
+    (= 1 n)))
+
+(define rempick
+  (lambda (n lat)
+    (cond
+     ((one? n) (cdr lat))
+     (else (cons (car lat)
+		 (rempick (sub1 n)
+			  (cdr lat)))))))
+
 ; Page break
+
+(one? 1)
+
+(one? 0)
+
+(one? 13)
+
+(occur '5 '(5 pears pears 6 prunes 9 9 dates))
+
+(all-nums '(5 pears 6 prunes 9 dates))
+
+(no-nums '(5 pears 6 prunes 9 dates))
+
+(number? 76)
+
+(number? 'tomato)
 
 (rempick 3 '(hotdogs with hot mustard))
 
