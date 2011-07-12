@@ -151,15 +151,39 @@
      ((eq? old (car lat)) (cons new
 				(multisubst new old (cdr lat))))
      (else (cons (car lat)
-		 (multisubst new old (cdr lat)))))))
+		 ( multisubst new old (cdr lat)))))))
 
 (define o+
   (lambda (x y)
     (cond
-     ((zero? x) y)
-     (else (add1 (add (sub1 x) y))))))
+     ((zero? y) x)
+     (else (add1 (o+ x (sub1 y)))))))
+
+(define o-
+  (lambda (x y)
+    (cond
+     ((zero? y) x)
+     (else (sub1 (o- x (sub1 y)))))))
+
+(define addtup
+  (lambda (tup)
+    (cond
+     ((null? tup) 0)
+     (else (+ (car tup) (addtup (cdr tup)))))))
+
+(define x
+  (lambda (n m)
+    (cond
+     ((zero? m) 0)
+     (else (o+ n (x n (sub1 m)))))))
 
 ; Page break
+
+(x 2 30)
+
+(addtup '(15 6 7 12 3))
+
+(o- 14 3)
 
 (o+ 46 12)
 
