@@ -154,16 +154,16 @@
 		 ( multisubst new old (cdr lat)))))))
 
 (define o+
-  (lambda (x y)
+  (lambda (n m)
     (cond
-     ((zero? y) x)
-     (else (add1 (o+ x (sub1 y)))))))
+     ((zero? m) n)
+     (else (add1 (o+ n (sub1 m)))))))
 
 (define o-
-  (lambda (x y)
+  (lambda (n m)
     (cond
-     ((zero? y) x)
-     (else (sub1 (o- x (sub1 y)))))))
+     ((zero? m) n)
+     (else (sub1 (o- n (sub1 m)))))))
 
 (define addtup
   (lambda (tup)
@@ -185,7 +185,35 @@
      (else (cons (o+ (car tup1) (car tup2))
 		 (tup+ (cdr tup1) (cdr tup2)))))))
 
+(define gt
+  (lambda (n m)
+    (cond
+     ((zero? n) #f)
+     ((zero? m) #t)
+     (else (gt (sub1 n) (sub1 m))))))
+
+(define lt
+  (lambda (n m)
+    (cond
+     ((zero? m) #f)
+     ((zero? n) #t)
+     (else (lt (sub1 n) (sub1 m))))))
+
 ; Page break
+
+(lt 12 133)
+
+(lt 6 6 )
+
+(lt 5 4)
+
+(gt 12 133)
+
+(gt 6 6)
+
+(gt 5 4)
+
+(tup+ '(3 7) '(4 6 8 1))
 
 (tup+ '(3 6 9 11 4) '(8 5 2 0 7))
 
