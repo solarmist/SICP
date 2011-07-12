@@ -11,7 +11,7 @@
 
 (define sub1
   (lambda (x)
-    (- x )))
+    (- x 1)))
 
 (define lat?
   (lambda (l)
@@ -153,7 +153,21 @@
      (else (cons (car lat)
 		 (multisubst new old (cdr lat)))))))
 
+(define o+
+  (lambda (x y)
+    (cond
+     ((zero? x) y)
+     (else (add1 (add (sub1 x) y))))))
+
 ; Page break
+
+(o+ 46 12)
+
+(sub1 12)
+
+(zero? 12)
+
+(zero? 0)
 
 (multisubst 'jelly 'd '(a b c d f g d h))
 
