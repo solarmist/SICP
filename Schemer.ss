@@ -199,7 +199,75 @@
      ((zero? n) #t)
      (else (lt (sub1 n) (sub1 m))))))
 
+(define eq
+  (lambda (n m)
+    (cond
+     ((and (zero? m) (zero? n)) #t)
+     ((or (zero? m) (zero? n)) #f)
+     (else (eq (sub1 n) (sub1 m))))))
+
+(define eq
+  (lambda (n m)
+    (cond
+     ((lt n m) #f)
+     ((gt n m) #f)
+     (else #t))))
+
+(define o^
+  (lambda (n m)
+    (cond
+     ((zero? m) 1)
+     (else (x n (o^ n (sub1 m)))))))
+
+(define o/
+  (lambda (n m)
+    (cond
+     ((< n m) 0)
+     (else (add1 (o/ (o- n m) m))))))
+
+(define length
+  (lambda (lat)
+    (cond
+     ((null? lat) 0)
+     (else (add1 (length (cdr lat)))))))
+
+(define pick
+  (lambda (n lat)
+    (cond
+     ((zero? (sub1 n)) (car lat))
+     (else (pick (sub1 n) (cdr lat))))))
+
+(define rempick
+  (lambda (n lat)
+    (cond
+     ((zero? (sub1 n)) (cdr lat))
+     (else (cons (car lat) 
+		 (rempick (sub1 n) 
+			  (cdr lat)))))))
+
 ; Page break
+
+(rempick 3 '(hotdogs with hot mustard))
+
+(pick 4 '(lasagna spaghetti ravioli macaroni meatball))
+
+(length '(hotdogs with mustard sauerkraut and pickles))
+
+(o/ 12 5)
+
+(o/ 5 6)
+
+(o^ 2 2)
+
+(eq? 'test 'test)
+
+(eq? 5 5)
+
+(eq 6 6)
+
+(eq 12 133)
+
+(eq 5 4)
 
 (lt 12 133)
 
