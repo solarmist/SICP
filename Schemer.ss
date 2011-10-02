@@ -405,7 +405,59 @@
      (else (cons (car l)
 		 (rember s (cdr l)))))))
 
+(define numbered?
+  (lambda (aexp)
+    (cond
+     ((atom? aexp) (number? aexp))
+     ((member? (car (cdr aexp)) '(+ * ^)) (and (numbered? (car aexp))
+					       (numbered? (car (cdr (cdr aexp))))))
+     (else #f))))
+
+(define operator
+  (lambda (aexp)
+    (cadr aexp)))
+
+(define 1st-sub-exp
+  (lambda (aexp)
+    (car aexp)))
+
+(define 2nd-sub-exp
+  (lambda (aexp)
+    (caddr aexp)))
+
+(define operation
+  (lambda (op operations)
+    (cond
+     ((null? operations) #f)
+     ((eq? op (caar operations)) (cadar operations))
+     (else (operation op (cdr operations))))))
+
+(define value
+  (lambda (nexp)
+    (cond
+     ((atom? nexp) nexp)
+     ((eq? (operator nexp) '+)
+	   (o+ (value (1st-sub-exp nexp))
+	       (value (2nd-sub-exp nexp))))
+     ((eq? (operator nexp) '*)
+	   (o* (value (1st-sub-exp nexp))
+	       (value (2nd-sub-exp nexp))))
+     ((eq? (operator nexp) '^)
+	   (o^ (value (1st-sub-exp nexp))
+	       (value (2nd-sub-exp nexp)))))))
+
 ; Page break
+(restart 1)
+
+(value '3)
+
+(operation '+ '((+ o+) (* o*) (^ o^)))
+
+(value '(1 + (2 ^ 5)))
+
+(numbered? '(1 + (2 * 5)))
+
+(numbered? '(1 + 3))
 
 (eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
 
