@@ -446,8 +446,357 @@
 	   (o^ (value (1st-sub-exp nexp))
 	       (value (2nd-sub-exp nexp)))))))
 
+(define set?
+  (lambda (lat)
+    (cond
+     ((null? lat) #t)
+     ((member? (car lat) (cdr lat)) #f)
+     (else (set? (cdr lat))))))
+
+(define makeset
+  (lambda (lat)
+    (cond
+     ((null? lat) '())
+     ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
+     (else (cons (car lat) (makeset (cdr lat)))))))
+
+(define makeset
+  (lambda (lat)
+    (cond
+     ((null? lat) '())
+     (else (cons (car lat) (makeset (multirember (car lat) 
+						 (cdr lat))))))))
+
+;Assume that they are sets already
+(define subset?
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) #t)
+     (else (and (member? (car set1) set2) 
+		(subset? (cdr set1) set2))))))
+
+(define eqset?
+  (lambda (set1 set2)
+    (and (subset? set1 set2)
+	 (subset? set2 set1))))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) #f)
+     (else (or (member? (car set1) set2)
+	       (intersect? (cdr set1) set2))))))
+
+(define intersect
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) '())
+     ((member? (car set1) set2) 
+      (cons (car set1) 
+	    (intersect (cdr set1) set2)))
+     (else (intersect (cdr set1) set2)))))
+
+(define union
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) set2)
+     ((member? (car set1) set2)
+      (union (cdr set1) set2))
+     (else (cons (car set1) 
+		 (union (cdr set1) 
+			set2))))))
+
+(define difference
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) '())
+     ((member? (car set1) set2)
+      (difference (cdr set1) set2))
+     (else (cons (car set1)
+		 (difference (cdr set1)
+			     set2))))))
+
+(define intersectall
+  (lambda (l-set)
+    (cond
+     ((null? (cdr l-set)) (car l-set))
+     (else (intersect (car l-set)
+		      (intersectall (cdr l-set)))))))
+
+(define a-pair?
+  (lambda (x)
+    (cond
+     ((or (atom? x) (null? x) (null? (cdr x))) #f)
+     ((null? (cdr (cdr x))) #t)
+     (else #f))))
+
+(define first
+  (lambda (p)
+    (car p)))
+
+(define second
+  (lambda (p)
+    (car (cdr p))))
+
+(define third
+  (lambda (p)
+    (car (cdr (cdr p)))))
+
+(define build
+  (lambda (s1 s2)
+    (cons s1 (cons s2 '()))))
+
+(define fun?
+  (lambda (rel)
+    (set? (firsts rel))))
+
+(define revpair
+  (lambda (pair)
+    (build (second pair) (first pair))))
+
+(define revrel
+  (lambda (rel)
+    (cond
+     ((null? rel) '())
+     (else (cons (revpair (car rel))
+		 (revrel (cdr rel)))))))
+
+(define fullfun?
+  (lambda (rel)
+    (and (fun? rel) (fun? (revrel rel)))))
+
+(define rember-f
+  (lambda (test? a l)
+    (cond
+     ((null? l) '())
+     ((test? a (car l)) (cdr l))
+     (else (cons (car l) (rember-f test? a (cdr l)))))))
+
+(define eq?-c
+  (lambda (x)
+    (lambda (a)
+      (eq? x a))))
+
+(define eq?-salad (eq?-c 'salad))
+
+(define rember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+       ((null? l) '())
+       ((test? (car l) a) (cdr l))
+       (else (cons (car l) ((rember-f test?) a l)))))))
+
+(define insertL-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+       ((null? l) '())
+       ((test? (car l) old) (cons new (cons old (cdr l))))
+       (else (cons (car l)
+		   ((insertL-f test?) new old (cdr l))))))))
+
+(define insertR-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+       ((null? l) '())
+       ((test? (car l) old) (cons old (cons new (cdr l))))
+       (else (cons (car l)
+		   ((insertR-f test?) new old (cdr l))))))))
+
+(define insert-g
+  (lambda (seq)
+    (lambda (new old l)
+      (cond
+       ((null? l) '())
+       ((eq? (car l) old) 
+	(seq new old (cdr l)))
+       (else (cons (car l)
+		   ((insert-g seq) 
+		     new 
+		     old 
+		     (cdr l))))))))
+
+(define insertL 
+  (insert-g
+   (lambda (new old l)
+     (cons new (cons old l)))))
+
+(define insertR
+  (insert-g
+   (lambda (new old l)
+     (cons old (cons new l)))))
+
+(define subst 
+  (insert-g (lambda (new old l)
+	      (cons new l))))
+
+(define rember
+  (lambda (a l)
+    ((insert-g (lambda (new old l) 
+		 l))
+     #f a l)))
+
+(define atom-to-function
+  (lambda (x)
+    (cond
+     ((eq? x '+) o+)
+     ((eq? x '*) o*)
+     (else o^))))
+
+(define value
+  (lambda (nexp)
+    (cond
+     ((atom? nexp) nexp)
+     (else ((atom-to-function (operator nexp))
+	    (value (1st-sub-exp nexp))
+	    (value (2nd-sub-exp nexp)))))))
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+       ((null? lat) '())
+       ((test? (car lat) a)
+	((multirember-f test?) a (cdr lat)))
+       (else (cons (car lat)
+		   ((multirember-f test?) a (cdr lat))))))))
+
+(define multirember-eq?
+  (multirember-f eq?))
+
+(define eq?-tuna
+  (eq?-c 'tuna))
+
+(define multiremberT
+  (lambda (test? lat)
+    (cond
+     ((null? lat) '())
+     ((test? (car lat))
+      (multiremberT test? (cdr lat)))
+     (else (cons (car lat)
+		 (multiremberT test?
+			       (cdr lat)))))))
+
+(define multirember&co
+  (lambda (a lat col)
+    (cond
+     ((null? lat)
+      (col '()) '())
+     ((eq? (car lat) a)
+      (multirember&co a 
+		      (cdr lat)
+		      (lambda (newlat seen)
+			(col newlat
+			     (cons (car lat) seen)))))
+     (else (multirember&co a 
+			   (cdr lat)
+			   (lambda (newlat seen)
+			     (col (cons (car lat) newlat)
+				  seen)))))))
+(define a-friend
+  (lambda (x y)
+    (null? y)))
+
 ; Page break
 (restart 1)
+
+(multirember&co 'tuna '(strawberries tuna and swordfish) a-friend)
+
+(multiremberT eq?-tuna '(shrimp salad tuna salad and tuna))
+
+((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
+
+(value '(5 + 3))
+
+(rember 'cat '(pasta cat car))
+
+(subst 'dog 'cat '(pasta cat car))
+
+(insertR 'dog 'cat '(pasta cat car))
+
+((eq?-c 'salad) 'tuna)
+
+(eq?-salad 'salad)
+
+(eq?-c 'salad)
+
+((rember-f eq?) 'jelly '(jelly beans are good))
+
+(fullfun? '((grape raisin)
+	    (plum prune)
+	    (stewed grape)))
+
+(fullfun? '((1 2) (2 3) (3 2)))
+
+(fullfun? '((1 2) (2 3) (3 4)))
+
+(revrel '((1 2) (2 4) (5 6)))
+
+(revpair '(1 2))
+
+(fun? '((4 3) (4 2) (1 3)))
+
+(fun? '((1 2) (2 5) (5 6)))
+
+(build 'full '(house))
+
+(first '(full (house)))
+
+(second '(full (house)))
+
+(a-pair? '((this cat)))
+
+(a-pair? '(full cat))
+
+(a-pair? '(full (house)))
+
+(intersectall '((a b c)
+		(c a d e)
+		(e f g h a b)))
+
+(intersectall '((6 pears and)
+		(3 peaches and 6 peppers)
+		(8 pears and 6 plums)
+		(and 6 prunes with some apples)))
+
+(difference '(macaroni and cheese)
+	    '(and))
+
+(union '(stewed tomatoes and macaroni casserole)
+       '(macaroni and cheese))
+
+(intersect '(stewed tomatoes and macaroni)
+	   '(macaroni and cheese))
+
+(intersect? '(stewed tomatoes and macaroni)
+	    '(6 chickens with large wings))
+
+(intersect? '(stewed tomatoes and macaroni)
+	    '(macaroni and cheese))
+
+(eqset? '(6 large chickens with wings)
+	'(6 chickens with large wings))
+
+(subset? '(5 chicken wings) '(5 hambergers
+				2 pieces fried chicken and
+				light duckling wings))
+
+(subset? '(4 pounds of horseradish) '(four pounds of chicken and
+					   5 ounces of horseradish))
+
+(makeset '(apple peach pear peach plum apple lemon peach))
+
+(makeset '(apple 3 pear 4 9 3 7 plum))
+
+(set? '(apple 3 pear 4 9 7 plum))
+
+(set? '(apple 3 pear 4 9 3 7 plum))
+
+(set? '(apples peaches pears plums))
+
+(set? '(apple peaches apple plum))
 
 (value '3)
 
