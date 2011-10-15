@@ -1,6 +1,8 @@
 "The Little Schemer"
 "Joshua Olson"
 
+"Chapter 1"
+
 (define atom?
   (lambda (x)
     (and (not (pair? x)) (not (null? x)))))
@@ -12,6 +14,8 @@
 (define sub1
   (lambda (x)
     (-1+ x)))
+
+"Chapter 2"
 
 (define lat?
   (lambda (l)
@@ -27,6 +31,8 @@
      (else (or (eq? (car lat) a)
 	       (member? a (cdr lat)))))))
 
+"Chapter 3"
+
 (define rember
   (lambda (a lat)
     (cond
@@ -36,7 +42,7 @@
 		 (rember a 
 			 (cdr lat)))))))
 
-;This version of firsts can handle lists that are mixed
+; This version of firsts can handle lists that are mixed
 (define firsts
   (lambda (l)
     (cond
@@ -45,10 +51,10 @@
 			    (firsts (cdr l))))
      (else (firsts (cdr l))))))
 
-;A generalized version of firsts 
-;;Enclosing scope must define the following
-;;Takes a description of the nth element
-;;Takes a test for the nth element
+; A generalized version of firsts 
+; Enclosing scope must define the following
+; Takes a description of the nth element
+; Takes a test for the nth element
 (define nths
   (lambda (l test nth)
     (cond
@@ -152,6 +158,8 @@
 				(multisubst new old (cdr lat))))
      (else (cons (car lat)
 		 ( multisubst new old (cdr lat)))))))
+
+"Chapter 4"
 
 (define o+
   (lambda (n m)
@@ -287,6 +295,8 @@
 		 (rempick (sub1 n)
 			  (cdr lat)))))))
 
+"Chapter 5"
+
 (define rember*
   (lambda (a l)
     (cond
@@ -405,6 +415,8 @@
      (else (cons (car l)
 		 (rember s (cdr l)))))))
 
+"Chapter 6"
+
 (define numbered?
   (lambda (aexp)
     (cond
@@ -445,6 +457,8 @@
      ((eq? (operator nexp) '^)
 	   (o^ (value (1st-sub-exp nexp))
 	       (value (2nd-sub-exp nexp)))))))
+
+"Chapter 7"
 
 (define set?
   (lambda (lat)
@@ -564,6 +578,8 @@
 (define fullfun?
   (lambda (rel)
     (and (fun? rel) (fun? (revrel rel)))))
+
+"Chapter 8"
 
 (define rember-f
   (lambda (test? a l)
@@ -685,11 +701,13 @@
      ((null? lat)
       (col '() '()))
      ((eq? (car lat) a)
+      ; Collects items that match in the second lst
       (multirember&co a 
 		      (cdr lat)
 		      (lambda (newlat seen)
 			(col newlat
 			     (cons (car lat) seen)))))
+     ; Collects everything else in the first lst
      (else (multirember&co a 
 			   (cdr lat)
 			   (lambda (newlat seen)
@@ -699,8 +717,95 @@
   (lambda (x y)
     (null? y)))
 
+(define new-friend
+  (lambda (newlat seen)
+    (a-friend newlat
+	 (cons 'tuna seen))))
+
+(define latest-friend
+  (lambda (newlat seen)
+    (a-friend (cons 'and newlat)
+	      seen)))
+
+(define last-friend
+  (lambda (x y)
+    (length x)))
+
+(define multiinsertLR
+  (lambda (new oldL oldR lat)
+    (cond
+     ((null? lat) '())
+     ((eq? (car lat) oldL)
+      (cons new
+	    (cons oldL
+		 (multiinsertLR new oldL oldR
+				(cdr lat)))))
+     ((eq? (car lat) oldR)
+      (cons oldR
+	    (cons new
+		  (multiinsertLR new oldL oldR
+				 (cdr lat)))))
+     (else
+      (cons (car lat)
+	    (multiinsertLR new oldL oldR
+			   (cdr lat)))))))
+
+(define multiinsertLR&co
+  (lambda (new oldL oldR lat col)
+    (cond
+     ((null? lat) 
+      (col (quote ()) 0 0))
+     ((eq? (car lat) oldL)
+      (multiinsertLR&co new oldL oldR (cdr lat)
+			(lambda (newlat L R)
+			  (col (cons new 
+				     (cons oldL 
+					   newlat)) 
+			       (add1 L) R))))
+     ((eq? (car lat) oldR)
+      (multiinsertLR&co new oldL oldR (cdr lat)
+			(lambda (newlat L R)
+			  (col (cons oldR 
+				     (cons new 
+					   newlat)) 
+			       L (add1 R)))))
+     (else
+      (multiinsertLR&co new oldL oldR (cdr lat)
+		     (lambda (newlat L R)
+		       (col (cons (car lat) 
+				  newlat) 
+			    L R)))))))
+
+(define lat-friend
+  (lambda (lat L R)
+    lat))
+
+(define L-friend
+  (lambda (lat L R)
+    L))
+
 ; Page break
 (restart 1)
+
+"Chapter 8"
+
+(multiinsertLR&co 'salty 'fish 'chips 
+		  '(chips and fish or fish and chips) 
+		  L-friend)
+
+(multiinsertLR&co 'salty 'fish 'chips 
+		  '(chips and fish or fish and chips) 
+		  lat-friend)
+
+(multiinsertLR 'fat 'cat 'cat '(one old cat and young dog))
+
+(multiinsertLR 'fat 'cat 'dog '(one old cat and young dog))
+
+(multirember&co 'tuna '(strawberries tuna and swordfish) last-friend)
+
+(latest-friend '(and) '(tuna))
+
+(new-friend '() '())
 
 (multirember&co 'tuna '(tuna) a-friend)
 
@@ -727,6 +832,8 @@
 (eq?-c 'salad)
 
 ((rember-f eq?) 'jelly '(jelly beans are good))
+
+"Chapter 7"
 
 (fullfun? '((grape raisin)
 	    (plum prune)
@@ -802,6 +909,8 @@
 
 (set? '(apple peaches apple plum))
 
+"Chapter 6"
+
 (value '3)
 
 (operation '+ '((+ o+) (* o*) (^ o^)))
@@ -811,6 +920,8 @@
 (numbered? '(1 + (2 * 5)))
 
 (numbered? '(1 + 3))
+
+"Chapter 5"
 
 (eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
 
@@ -861,6 +972,8 @@
 (rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
 
 (rember* 'sauce '(((tomato sauce)) ((bean) sauce) (and ((flying)) sauce)))
+
+"Chapter 4"
 
 (one? 1)
 
@@ -929,6 +1042,8 @@
 (zero? 12)
 
 (zero? 0)
+
+"Chapters 1, 2 and 3"
 
 (multisubst 'jelly 'd '(a b c d f g d h))
 
