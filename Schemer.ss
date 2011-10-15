@@ -683,7 +683,7 @@
   (lambda (a lat col)
     (cond
      ((null? lat)
-      (col '()) '())
+      (col '() '()))
      ((eq? (car lat) a)
       (multirember&co a 
 		      (cdr lat)
@@ -701,6 +701,10 @@
 
 ; Page break
 (restart 1)
+
+(multirember&co 'tuna '(tuna) a-friend)
+
+(multirember&co 'tuna '() a-friend)
 
 (multirember&co 'tuna '(strawberries tuna and swordfish) a-friend)
 
