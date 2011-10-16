@@ -185,6 +185,8 @@
      ((zero? m) 0)
      (else (o+ n (x n (sub1 m)))))))
 
+(define o* x)
+
 (define tup+ 
   (lambda (tup1 tup2)
     (cond
@@ -784,10 +786,57 @@
   (lambda (lat L R)
     L))
 
+(define even?
+  (lambda (n)
+    (= (o* (o/ n 2) 2) n)))
+
+(define evens-only*
+  (lambda (l)
+    (cond
+     ((null? l) '())
+     ((atom? (car l))
+      (cond
+       ((even? (car l)) (cons (car l) 
+			      (evens-only* (cdr l))))
+       (else (evens-only* (cdr l)))))
+     (else (cons (evens-only* (car l))
+		 (evens-only* (cdr l)))))))
+
+(define evens-only*&co
+  (lambda (l col)
+    (cond
+     ((null? l) (col '() 1 0))
+     ((atom? (car l))
+      (cond
+       ((even? (car l)) (evens-only*&co (cdr l)
+				       (lambda (newl p s)
+					 (col (cons (car l) newl)
+					      (o* (car l) p) s))))
+       (else (evens-only*&co (cdr l)
+			     (lambda (newl p s)
+			       (col newl
+				    p (o+ (car l) s))))))
+     (else (evens-only*&co (car l)
+			   (lambda (al ap as)
+			     (evens-only*&co (cdr l)
+					     (lambda (dl dp ds)
+					       (col (cons al dl)
+						    (o* ap dp)
+						    (o+ as ds)))))))))))
+
 ; Page break
 (restart 1)
 
 "Chapter 8"
+
+(evens-only*&co '((9 1 2 8) 3 22 ((9 9) 7 6) 2) 
+		(lambda (newl product sum)
+		  (cons sum
+			(cons product newl))))
+
+(evens-only* '((9 1 2 8) 3 22 ((9 9) 7 6) 2))
+
+(even? 2)
 
 (multiinsertLR&co 'salty 'fish 'chips 
 		  '(chips and fish or fish and chips) 
