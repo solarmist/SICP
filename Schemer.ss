@@ -815,24 +815,26 @@
        (else (evens-only*&co (cdr l)
 			     (lambda (newl p s)
 			       (col newl
-				    p (o+ (car l) s))))))
+				    p (o+ (car l) s)))))))
      (else (evens-only*&co (car l)
 			   (lambda (al ap as)
 			     (evens-only*&co (cdr l)
 					     (lambda (dl dp ds)
 					       (col (cons al dl)
 						    (o* ap dp)
-						    (o+ as ds)))))))))))
+						    (o+ as ds))))))))))
+
+(define the-last-friend
+  (lambda (newl product sum)
+    (cons sum (cons product newl))))
 
 ; Page break
 (restart 1)
 
 "Chapter 8"
 
-(evens-only*&co '((9 1 2 8) 3 22 ((9 9) 7 6) 2) 
-		(lambda (newl product sum)
-		  (cons sum
-			(cons product newl))))
+(evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) 
+		the-last-friend)
 
 (evens-only* '((9 1 2 8) 3 22 ((9 9) 7 6) 2))
 
