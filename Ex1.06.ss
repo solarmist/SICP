@@ -38,8 +38,8 @@
 
 ;What happens when Alyssa attempts to use this to compute square roots? Explain.
 
-;Stack overflow because the procedure alway attempts to expand both clauses of the if 
-;statement if it isn't a special form
+;Stack overflow because the procedure alway attempts to expand both clauses of the if
+;statement because it isn't a special form
 
-(sqrt 2)
+;(sqrt 2)
 ;Aborting!: maximum recursion depth exceeded

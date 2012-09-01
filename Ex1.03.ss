@@ -1,4 +1,4 @@
-;Exercise 1.3.  Define a procedure that takes three numbers as arguments and 
+;Exercise 1.3.  Define a procedure that takes three numbers as arguments and
 ;returns the sum of the squares of the two larger numbers.
 "Exercise 1.3"
 "Joshua Olson"
@@ -16,14 +16,14 @@
 (define (sum-of-squares x y)
   (+ (square x) (square y)))
 
-(define (eval-biggest a b c function)
-  (cond ((and (> a c) (> b c)) (function a b))
-	((and (> a b) (> c b)) (function a c))
-	((and (> b a) (> c a)) (function b c))
-	(else (function a b))))
+(define (eval-biggest a b c)
+  (cond ((and (> a c) (> b c)) (sum-of-squares a b))
+	((and (> a b) (> c b)) (sum-of-squares a c))
+	((and (> b a) (> c a)) (sum-of-squares b c))
+	(else (sum-of-squares a b))))
 
-(define (sq-sum a b c) (eval-biggest a b c sum-of-squares))
- 
+(define (sq-sum a b c) (eval-biggest a b c))
+
 (sq-sum 2 2 2)
 ;Value 8
 
